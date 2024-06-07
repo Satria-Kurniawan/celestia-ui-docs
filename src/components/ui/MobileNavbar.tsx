@@ -26,7 +26,7 @@ export default function MobileNavbar() {
 
   return (
     <nav
-      className={`py-3 px-3 sticky top-[3.25rem] border-b ${
+      className={`py-3 px-3 sticky top-[3.35rem] border-b ${
         scrolled ? "backdrop-blur-md" : ""
       }`}
     >

@@ -20,7 +20,7 @@ export default function Showcase({
 
   return (
     <article>
-      <div className="flex justify-between">
+      <div className="flex flex-wrap gap-3 justify-between">
         <h1 className="font-semibold text-lg">{title}</h1>
         <div className="p-1 rounded-lg bg-light flex gap-x-1">
           <button
