@@ -11,6 +11,8 @@ export default function MobileNavbar() {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState<boolean>(false);
   const [scrolled, setScrolled] = React.useState<boolean>(false);
+  const [lastScrollY, setLastScrolY] = React.useState<number>(0);
+  const [show, setShow] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -22,13 +24,37 @@ export default function MobileNavbar() {
     };
   }, []);
 
+  React.useEffect(() => {
+    const handleShowOnScrolUp = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < lastScrollY) setShow(true);
+      else setShow(false);
+
+      setLastScrolY(currentScrollY);
+    };
+
+    document.addEventListener("scroll", handleShowOnScrolUp);
+
+    return () => {
+      document.removeEventListener("scroll", handleShowOnScrolUp);
+    };
+  }, [lastScrollY]);
+
   if (!isMobile) return null;
 
   return (
-    <nav
-      className={`py-3 px-3 sticky top-[3.35rem] border-b ${
-        scrolled ? "backdrop-blur-md" : ""
-      }`}
+    <motion.nav
+      animate={{
+        top: "3.3rem",
+        position: show ? "sticky" : "static",
+        x: show ? 0 : scrolled ? "-100%" : 0,
+        opacity: show ? 1 : scrolled ? 0 : 1,
+      }}
+      transition={{
+        duration: 0.5,
+      }}
+      className={`py-3 px-3 border-b ${scrolled ? "backdrop-blur-md" : ""}`}
     >
       <div
         className="flex items-center gap-x-3 cursor-pointer"
@@ -40,7 +66,11 @@ export default function MobileNavbar() {
         <span className="font-semibold">Menu</span>
       </div>
       {open && (
-        <motion.section className="z-10 p-4 absolute top-12 left-0 right-0 bg-white border-b">
+        <motion.section
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="z-10 p-4 absolute top-12 left-0 right-0 bg-white border-b overflow-hidden"
+        >
           <ul className="flex flex-col gap-y-5 overflow-auto">
             {menus.map((menu, index) => {
               return (
@@ -82,6 +112,6 @@ export default function MobileNavbar() {
           </ul>
         </motion.section>
       )}
-    </nav>
+    </motion.nav>
   );
 }

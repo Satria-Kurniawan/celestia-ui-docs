@@ -22,6 +22,8 @@ export default function Navbar() {
   const [openFeedback, setOpenFeedback] = React.useState<boolean>(false);
   const [openSearch, setOpenSearch] = React.useState<boolean>(false);
   const [scrolled, setScrolled] = React.useState<boolean>(false);
+  const [lastScrollY, setLastScrolY] = React.useState<number>(0);
+  const [show, setShow] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -33,10 +35,35 @@ export default function Navbar() {
     };
   }, []);
 
+  React.useEffect(() => {
+    const handleShowOnScrolUp = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < lastScrollY) setShow(true);
+      else setShow(false);
+
+      setLastScrolY(currentScrollY);
+    };
+
+    document.addEventListener("scroll", handleShowOnScrolUp);
+
+    return () => {
+      document.removeEventListener("scroll", handleShowOnScrolUp);
+    };
+  }, [lastScrollY]);
+
   return (
     <>
-      <nav
-        className={`z-50 py-3 sticky top-0 ${isMobile ? "border-b" : ""} ${
+      <motion.nav
+        animate={{
+          top: show ? 0 : "-10%",
+          position: show ? "sticky" : "static",
+          opacity: show ? 1 : scrolled ? 0 : 1,
+        }}
+        transition={{
+          duration: 0.5,
+        }}
+        className={`z-50 py-3 ${isMobile ? "border-b" : ""} ${
           scrolled ? "backdrop-blur-md" : ""
         }`}
       >
@@ -106,7 +133,7 @@ export default function Navbar() {
             </div>
           )}
         </section>
-      </nav>
+      </motion.nav>
 
       {isMobile && active && (
         <motion.div
